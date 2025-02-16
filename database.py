@@ -20,6 +20,7 @@ conn = pymysql.connect(
 session_url = 'sessions?'
 driver_url =  'drivers?'
 meeting_url = 'meetings?'
+racecontrol_url = 'race_control?'
 base_url = 'https://api.openf1.org/v1/'
 
 def session_data(base_url,session,year):
@@ -122,6 +123,12 @@ insert_sql3 = '''
     EndDate = Values(EndDate)  
 '''
 
+insert_raceControl = '''
+INSERT IGNORE INTO f1_RaceControl values (%s, %s, %s,%s, %s, %s, %s, %s)
+'''
+
+insert_laprecords = 'INSERT IGNORE INTO f1_Laps Values (%s, %s, %s,%s, %s, %s, %s, %s)'
+
 mycursor = conn.cursor()
 mycursor.execute(sql_table3)
 
@@ -133,15 +140,48 @@ def data_withdatetime():
         mycursor.execute(insert_sql3, (data['session_key'], data['session_name'],data['session_type'], data['meeting_key'],
                         startdate, enddate))
     conn.commit()
-    
-   
-ddriverinfo = driver_data(base_url, driver_url,2023)
-for data in ddriverinfo:
-    mycursor.execute(insert_sql1, (data['driver_number'], data['broadcast_name'], data['country_code'], data['first_name'], data['last_name'],
-                                   data['full_name'], data['headshot_url'], data['meeting_key'], data['name_acronym'], data['session_key'],
-                                   data['team_colour'], data['team_name']))
-    print('added successfully')
-conn.commit()
+ 
+def RaceControl():
+    full_url = f'{base_url}{racecontrol_url}date>=2023-01-01&date<2024-12-31'
+    response = requests.get(full_url)
+    print(full_url)
+    if response.status_code == 200:
+        datas = response.json()
+        print(len(datas))
+        print(datas[0])
+        for data in datas:
+            date = parser.parse(data['date']).strftime('%Y-%m-%d $H:%M:$S')
+            mycursor.execute(insert_raceControl, (data['session_key'], data['driver_number'], data['category'],
+                                                  date , data['flag'], data['lap_number'],data['message'], data['scope']))
+        conn.commit() 
+
+def Lapdata():
+    mycursor.execute('select DISTINCT SessionKey from f1_sessions')
+    sessionkeylist = mycursor.fetchall()
+    sessionlist = [sessionlist[0] for sessionlist in sessionkeylist]
+    print(len(sessionlist))
+    for session in sessionlist:
+        full_url = f'{base_url}laps?session_key={session}'
+        print(full_url)
+        response = requests.get(full_url)
+        if response.status_code == 200:
+            datas = response.json()
+            print(len(datas))
+            for data in datas:
+                mycursor.execute(insert_laprecords, (data['driver_number'],data['session_key'], data['lap_number'],
+                                                     data['lap_duration'], data['duration_sector_1'], data['duration_sector_3'], data['duration_sector_3'],
+                                                     data['st_speed']))
+            conn.commit()
+
+Lapdata()
+  
+# ddriverinfo = driver_data(base_url, driver_url,2023)
+# for data in ddriverinfo:
+#     mycursor.execute(insert_sql1, (data['driver_number'], data['broadcast_name'], data['country_code'], data['first_name'], data['last_name'],
+#                                    data['full_name'], data['headshot_url'], data['meeting_key'], data['name_acronym'], data['session_key'],
+#                                    data['team_colour'], data['team_name']))
+#     print('added successfully')
+# conn.commit()
 
 
     
