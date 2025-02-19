@@ -1,0 +1,1 @@
+select * from stg_tpch_orders where date(oderdate) > CURRENT_DATE()
