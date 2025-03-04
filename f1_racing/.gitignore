@@ -2,5 +2,4 @@
 target/
 dbt_packages/
 logs/
-api_ingestion_tables.py
 .env

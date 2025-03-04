@@ -133,7 +133,7 @@ mycursor = conn.cursor()
 mycursor.execute(sql_table3)
 
 def data_withdatetime():
-    meeting_data = API_CALL(base_url, session_url, 2024)
+    meeting_data = API_CALL(base_url, session_url, 2023)
     for data in meeting_data:
         startdate = parser.parse(data['date_start']).strftime('%Y-%m-%d %H:%M:%S')
         enddate = parser.parse(data['date_end']).strftime('%Y-%m-%d %H:%M:%S')
@@ -150,7 +150,7 @@ def RaceControl():
         print(len(datas))
         print(datas[0])
         for data in datas:
-            date = parser.parse(data['date']).strftime('%Y-%m-%d $H:%M:$S')
+            date = parser.parse(data['date']).strftime('%Y-%m-%d %H:%M:%S')
             mycursor.execute(insert_raceControl, (data['session_key'], data['driver_number'], data['category'],
                                                   date , data['flag'], data['lap_number'],data['message'], data['scope']))
         conn.commit() 
@@ -175,13 +175,13 @@ def Lapdata():
 
 Lapdata()
   
-# ddriverinfo = driver_data(base_url, driver_url,2023)
-# for data in ddriverinfo:
-#     mycursor.execute(insert_sql1, (data['driver_number'], data['broadcast_name'], data['country_code'], data['first_name'], data['last_name'],
-#                                    data['full_name'], data['headshot_url'], data['meeting_key'], data['name_acronym'], data['session_key'],
-#                                    data['team_colour'], data['team_name']))
-#     print('added successfully')
-# conn.commit()
+ddriverinfo = driver_data(base_url, driver_url,2023)
+for data in ddriverinfo:
+    mycursor.execute(insert_sql1, (data['driver_number'], data['broadcast_name'], data['country_code'], data['first_name'], data['last_name'],
+                                   data['full_name'], data['headshot_url'], data['meeting_key'], data['name_acronym'], data['session_key'],
+                                   data['team_colour'], data['team_name']))
+    print('added successfully')
+conn.commit()
 
 
     
