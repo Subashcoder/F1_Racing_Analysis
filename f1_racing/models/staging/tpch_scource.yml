@@ -1,20 +1,35 @@
 version: 2
 
 sources:
-  - name: tpch
-    database: snowflake_sample_data
-    schema: tpch_sf1
+  - name: F1RACING
+    database: f1_Racing
+    schema: F1_Racing_Raw
     tables:
-      - name: orders
-        columns: 
-        - name: o_orderkey
+      - name: f1_sessions
+        columns:
+        - name: sessionKey
+          tests:
+            - not_null
+      
+      - name: f1_meeting
+        columns:
+        - name: meetingkey
           tests:
             - unique
             - not_null
-      - name: lineitem
+
+      - name: Driver_INFO
         columns: 
-        - name: l_orderkey
+        - name: Driver_Number
           tests:
-            - relationships:
-                to: source('tpch', 'orders')
-                field: o_orderkey
+            - not_null
+
+      - name: F1_Laps
+        columns: 
+        - name: sessionkey
+        
+      
+      - name: f1_Racecontrol
+        columns:
+        - name: sessionkey
+          
