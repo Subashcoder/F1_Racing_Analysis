@@ -7,29 +7,35 @@ sources:
     tables:
       - name: f1_sessions
         columns:
-        - name: sessionKey
-          tests:
-            - not_null
+          - name: sessionKey
+            tests:
+              - not_null
       
       - name: f1_meeting
         columns:
-        - name: meetingkey
-          tests:
-            - unique
-            - not_null
+          - name: meetingkey
+            tests:
+              - unique
+              - not_null
 
       - name: Driver_INFO
         columns: 
-        - name: Driver_Number
-          tests:
-            - not_null
+          - name: Driver_Number
+            tests:
+              - not_null
 
       - name: F1_Laps
         columns: 
-        - name: sessionkey
+          - name: sessionkey
+            tests:
+              - relationships:
+                  to: source('F1RACING', 'f1_sessions')
+                  field: sessionKey
         
-      
       - name: f1_Racecontrol
         columns:
-        - name: sessionkey
-          
+          - name: sessionkey
+            tests:
+              - relationships:
+                  to: source('F1RACING', 'f1_sessions')
+                  field: sessionKey
